@@ -61,31 +61,38 @@ export default function AthleteDashboard() {
     <Layout>
       <div className="space-y-8">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-green-600 rounded-xl p-8 text-white">
+        <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+          <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-2">Welcome back, Rajesh!</h1>
           <p className="text-blue-100 mb-6">Ready to push your limits today?</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               to="/athlete/tests"
-              className="bg-white/20 backdrop-blur-md hover:bg-white/30 px-6 py-3 rounded-lg transition-all flex items-center space-x-2"
+              className="bg-white/20 backdrop-blur-md hover:bg-white/30 px-6 py-3 rounded-xl transition-all flex items-center space-x-2 hover:scale-105 shadow-lg"
             >
               <Upload className="h-5 w-5" />
               <span>Record New Test</span>
             </Link>
             <Link
               to="/athlete/progress"
-              className="border border-white/30 hover:bg-white/10 px-6 py-3 rounded-lg transition-all flex items-center space-x-2"
+              className="border border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl transition-all flex items-center space-x-2 hover:scale-105 shadow-lg"
             >
               <TrendingUp className="h-5 w-5" />
               <span>View Progress</span>
             </Link>
           </div>
+          </div>
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <div key={index} className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all hover:scale-105 backdrop-blur-sm">
               <div className={`inline-flex p-3 rounded-lg ${stat.bg} mb-4`}>
                 <div className={`text-2xl font-bold ${stat.color}`}>
                   {stat.value}
@@ -99,11 +106,13 @@ export default function AthleteDashboard() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Recent Tests */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100">
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all backdrop-blur-sm">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                  <Clock className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+                    <Clock className="h-5 w-5 text-white" />
+                  </div>
                   <span>Recent Tests</span>
                 </h2>
                 <Link
@@ -117,10 +126,10 @@ export default function AthleteDashboard() {
             <div className="p-6">
               <div className="space-y-4">
                 {recentTests.map((test, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl hover:shadow-lg transition-all border border-gray-200 hover:border-blue-300 group">
                     <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Target className="h-5 w-5 text-blue-600" />
+                      <div className="p-3 bg-gradient-to-r from-blue-500 to-green-500 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                        <Target className="h-5 w-5 text-white" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{test.name}</h3>
@@ -144,18 +153,20 @@ export default function AthleteDashboard() {
           </div>
 
           {/* Achievements */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all backdrop-blur-sm">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                <Award className="h-5 w-5 text-orange-600" />
+                <div className="p-2 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg">
+                  <Award className="h-5 w-5 text-white" />
+                </div>
                 <span>Achievements</span>
               </h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
                 {achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg">
-                    <div className="text-2xl">{achievement.icon}</div>
+                  <div key={index} className="flex items-start space-x-3 p-4 bg-gradient-to-r from-orange-50 via-yellow-50 to-amber-50 rounded-xl border border-orange-200 hover:shadow-lg transition-all hover:scale-105 group">
+                    <div className="text-3xl group-hover:scale-110 transition-transform">{achievement.icon}</div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
                       <p className="text-sm text-gray-600">{achievement.description}</p>
@@ -165,7 +176,7 @@ export default function AthleteDashboard() {
               </div>
               <Link
                 to="/athlete/profile"
-                className="mt-4 block text-center bg-gradient-to-r from-orange-600 to-yellow-600 text-white py-2 rounded-lg hover:opacity-90 transition-all"
+                className="mt-4 block text-center bg-gradient-to-r from-orange-600 to-yellow-600 text-white py-3 rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg"
               >
                 View All Achievements
               </Link>
@@ -177,11 +188,11 @@ export default function AthleteDashboard() {
         <div className="grid md:grid-cols-3 gap-6">
           <Link
             to="/athlete/tests"
-            className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all transform hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all transform hover:-translate-y-2 hover:scale-105 backdrop-blur-sm group"
           >
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Upload className="h-8 w-8 text-blue-600" />
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <Upload className="h-8 w-8 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Record Tests</h3>
@@ -192,11 +203,11 @@ export default function AthleteDashboard() {
 
           <Link
             to="/athlete/leaderboard"
-            className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all transform hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all transform hover:-translate-y-2 hover:scale-105 backdrop-blur-sm group"
           >
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Trophy className="h-8 w-8 text-green-600" />
+              <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <Trophy className="h-8 w-8 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Leaderboard</h3>
@@ -207,11 +218,11 @@ export default function AthleteDashboard() {
 
           <Link
             to="/athlete/progress"
-            className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all transform hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all transform hover:-translate-y-2 hover:scale-105 backdrop-blur-sm group"
           >
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <TrendingUp className="h-8 w-8 text-purple-600" />
+              <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <TrendingUp className="h-8 w-8 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Progress</h3>
