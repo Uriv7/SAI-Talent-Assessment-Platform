@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
+import VirtualCoach from '../../components/VirtualCoach';
+import AdaptiveTesting from '../../components/AdaptiveTesting';
 import { 
   Upload, 
   Play, 
@@ -16,6 +18,22 @@ export default function TestUpload() {
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'analyzing' | 'complete'>('idle');
   const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [showAdaptiveTesting, setShowAdaptiveTesting] = useState(false);
+  const [adaptiveRecommendations, setAdaptiveRecommendations] = useState<any[]>([]);
+
+  // Mock athlete profile for adaptive testing
+  const athleteProfile = {
+    age: 20,
+    height: 175,
+    weight: 68,
+    fitnessLevel: 'intermediate' as const,
+    previousScores: {
+      'sprint-100m': 78,
+      'vertical-jump': 72,
+      'sit-ups': 85
+    },
+    injuries: []
+  };
 
   const tests = [
     {
@@ -119,37 +137,87 @@ export default function TestUpload() {
     setUploadStatus('complete');
   };
 
+  const handleTestAdjustment = (adjustments: any[]) => {
+    setAdaptiveRecommendations(adjustments);
+  };
+
   const selectedTestData = tests.find(t => t.id === selectedTest);
 
   return (
     <Layout>
+      <VirtualCoach 
+        testType={selectedTest || undefined}
+        performanceData={analysisResults}
+        isActive={uploadStatus === 'analyzing' || uploadStatus === 'complete'}
+      />
       <div className="space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-green-600 rounded-xl p-8 text-white">
-          <h1 className="text-3xl font-bold mb-2">Record Fitness Tests</h1>
-          <p className="text-blue-100">Follow the guided instructions and let our AI analyze your performance</p>
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 rounded-xl p-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">🎯 Smart Fitness Assessment</h1>
+                <p className="text-blue-100">AI-powered testing with personalized coaching and adaptive protocols</p>
+              </div>
+              <button
+                onClick={() => setShowAdaptiveTesting(!showAdaptiveTesting)}
+                className="bg-white/20 backdrop-blur-md hover:bg-white/30 px-6 py-3 rounded-lg transition-all flex items-center space-x-2"
+              >
+                <Brain className="h-5 w-5" />
+                <span>Adaptive Testing</span>
+              </button>
+            </div>
+          </div>
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
         </div>
+
+        {/* Adaptive Testing Panel */}
+        {showAdaptiveTesting && (
+          <AdaptiveTesting 
+            athleteProfile={athleteProfile}
+            onTestAdjustment={handleTestAdjustment}
+          />
+        )}
 
         {!selectedTest ? (
           /* Test Selection */
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
             {tests.map((test) => {
               const Icon = test.icon;
+              const hasAdaptiveRecommendation = adaptiveRecommendations.find(r => r.testId === test.id);
               return (
                 <div
                   key={test.id}
                   onClick={() => handleTestSelect(test.id)}
-                  className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer"
+                  className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer relative overflow-hidden group"
                 >
-                  <div className="p-3 bg-blue-100 rounded-lg mb-4 inline-block">
+                  {hasAdaptiveRecommendation && (
+                    <div className="absolute top-2 right-2">
+                      <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center space-x-1">
+                        <Brain className="h-3 w-3" />
+                        <span>ADAPTIVE</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-3 bg-gradient-to-r from-blue-100 to-green-100 rounded-lg mb-4 inline-block group-hover:scale-110 transition-transform">
                     <Icon className="h-8 w-8 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{test.name}</h3>
                   <p className="text-gray-600 mb-4">{test.description}</p>
-                  <div className="flex justify-between items-center text-sm text-gray-500">
+                  <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
                     <span>⏱️ {test.duration}</span>
                     <span>📱 Video Required</span>
                   </div>
+                  {hasAdaptiveRecommendation && (
+                    <div className="text-xs text-purple-600 font-medium">
+                      ✨ Customized for your level
+                    </div>
+                  )}
+                  {/* Hover Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-green-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
               );
             })}
@@ -269,43 +337,68 @@ export default function TestUpload() {
                 {uploadStatus === 'complete' && analysisResults && (
                   <div className="space-y-6">
                     <div className="text-center">
-                      <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                      <div className="relative">
+                        <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4 animate-bounce" />
+                        <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-25"></div>
+                      </div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Analysis Complete!</h3>
                       <p className="text-gray-600">Here are your results and AI-powered insights</p>
                     </div>
 
                     {/* Score Card */}
-                    <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-xl p-6 text-white text-center">
+                    <div className="bg-gradient-to-r from-green-500 via-blue-600 to-purple-600 rounded-xl p-6 text-white text-center relative overflow-hidden">
+                      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                      <div className="relative z-10">
                       <h4 className="text-lg font-semibold mb-2">Your Score</h4>
-                      <div className="text-5xl font-bold mb-2">{analysisResults.score}</div>
+                        <div className="text-6xl font-bold mb-2 animate-pulse">{analysisResults.score}</div>
                       <div className="text-green-100">Out of 100</div>
+                        <div className="mt-4 flex items-center justify-center space-x-4 text-sm">
+                          <div className="flex items-center space-x-1">
+                            <Trophy className="h-4 w-4" />
+                            <span>Personal Best!</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Benchmark Comparison */}
-                    <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6 border border-blue-200">
                       <h4 className="font-semibold text-gray-900 mb-4">Benchmark Comparison</h4>
                       <div className="grid md:grid-cols-3 gap-4">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{analysisResults.benchmarkComparison.percentile}%</div>
+                          <div className="text-3xl font-bold text-blue-600 animate-count-up">{analysisResults.benchmarkComparison.percentile}%</div>
                           <div className="text-sm text-gray-600">Age Group Percentile</div>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-2000"
+                              style={{ width: `${analysisResults.benchmarkComparison.percentile}%` }}
+                            ></div>
+                          </div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{analysisResults.benchmarkComparison.national}%</div>
+                          <div className="text-3xl font-bold text-green-600 animate-count-up">{analysisResults.benchmarkComparison.national}%</div>
                           <div className="text-sm text-gray-600">National Average</div>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-green-600 h-2 rounded-full transition-all duration-2000"
+                              style={{ width: `${analysisResults.benchmarkComparison.national}%` }}
+                            ></div>
+                          </div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-orange-600">#{Math.floor(Math.random() * 100) + 1}</div>
+                          <div className="text-3xl font-bold text-orange-600">#{Math.floor(Math.random() * 100) + 1}</div>
                           <div className="text-sm text-gray-600">State Ranking</div>
+                          <div className="text-xs text-orange-600 font-medium mt-1">↑ Moved up 3 positions!</div>
                         </div>
                       </div>
                     </div>
 
                     {/* AI Feedback */}
-                    <div className="bg-blue-50 rounded-lg p-6">
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6 border border-blue-200">
                       <h4 className="font-semibold text-gray-900 mb-4">AI Performance Feedback</h4>
                       <div className="space-y-3">
                         {analysisResults.feedback.map((item: string, index: number) => (
-                          <div key={index} className="flex items-start space-x-3">
+                          <div key={index} className="flex items-start space-x-3 animate-slide-in" style={{ animationDelay: `${index * 200}ms` }}>
                             <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                             <span className="text-gray-700">{item}</span>
                           </div>
@@ -314,16 +407,23 @@ export default function TestUpload() {
                     </div>
 
                     {/* AI Insights */}
-                    <div className="bg-purple-50 rounded-lg p-6">
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
                       <h4 className="font-semibold text-gray-900 mb-4">Improvement Recommendations</h4>
                       <div className="space-y-3">
                         {analysisResults.aiInsights.map((insight: string, index: number) => (
-                          <div key={index} className="flex items-start space-x-3">
+                          <div key={index} className="flex items-start space-x-3 animate-slide-in" style={{ animationDelay: `${index * 300}ms` }}>
                             <Zap className="h-5 w-5 text-purple-600 mt-0.5" />
                             <span className="text-gray-700">{insight}</span>
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    {/* Achievement Badge */}
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 text-center">
+                      <div className="text-4xl mb-2">🏆</div>
+                      <h4 className="font-bold text-yellow-800 mb-1">New Achievement Unlocked!</h4>
+                      <p className="text-sm text-yellow-700">Top 25% in State Rankings</p>
                     </div>
 
                     <div className="flex space-x-4">
@@ -332,13 +432,13 @@ export default function TestUpload() {
                           setUploadStatus('idle');
                           setAnalysisResults(null);
                         }}
-                        className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-lg hover:opacity-90 transition-all"
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-lg hover:opacity-90 transition-all transform hover:scale-105"
                       >
                         Record Another Test
                       </button>
                       <button
                         onClick={() => setSelectedTest(null)}
-                        className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-all"
+                        className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-all transform hover:scale-105"
                       >
                         Back to Test Selection
                       </button>
